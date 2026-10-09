@@ -6,11 +6,13 @@
   ],
   "scripts": {
     "dev": "bun run --filter '*' dev",
-    "lint": "bun run --filter '*' lint",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "lint": "biome lint",
+    "format": "biome format --write",
+    "format:check": "biome format"
   },
   "devDependencies": {
-    "oxfmt": "0.72.0"
+    "@biomejs/biome": "2.5.15"
   }
 }

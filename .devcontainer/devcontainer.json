@@ -18,14 +18,25 @@
 
   "customizations": {
     "vscode": {
-      "extensions": ["oxc.oxc-vscode"],
+      "extensions": [
+        "biomejs.biome",
+        "mikestead.dotenv",
+        "bradlc.vscode-tailwindcss",
+        "redhat.vscode-yaml",
+        "SalomonKylian.html-quick-wrapper",
+        "formulahendry.auto-rename-tag",
+        "aaron-bond.better-comments",
+        "usernamehw.errorlens",
+        "PKief.material-icon-theme",
+        "YoavBls.pretty-ts-errors"
+      ],
       "settings": {
-        "oxc.enable": true,
-        "oxc.lint.run": "onType",
-        "editor.defaultFormatter": "oxc.oxc-vscode",
+        "editor.defaultFormatter": "biomejs.biome",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-          "source.fixAll.oxc": "explicit"
+          "source.fixAll.biome": "explicit",
+          "source.organizeImports.biome": "explicit",
+          "source.action.useSortedAttributes.biome": "explicit"
         }
       }
     }

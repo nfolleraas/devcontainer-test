@@ -69,14 +69,25 @@ only what it declares. Always run `bun install` from the root.
 
   "customizations": {
     "vscode": {
-      "extensions": ["oxc.oxc-vscode"],
+      "extensions": [
+        "biomejs.biome",
+        "mikestead.dotenv",
+        "bradlc.vscode-tailwindcss",
+        "redhat.vscode-yaml",
+        "SalomonKylian.html-quick-wrapper",
+        "formulahendry.auto-rename-tag",
+        "aaron-bond.better-comments",
+        "usernamehw.errorlens",
+        "PKief.material-icon-theme",
+        "YoavBls.pretty-ts-errors"
+      ],
       "settings": {
-        "oxc.enable": true,
-        "oxc.lint.run": "onType",
-        "editor.defaultFormatter": "oxc.oxc-vscode",
+        "editor.defaultFormatter": "biomejs.biome",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-          "source.fixAll.oxc": "explicit"
+          "source.fixAll.biome": "explicit",
+          "source.organizeImports.biome": "explicit",
+          "source.action.useSortedAttributes.biome": "explicit"
         }
       }
     }
@@ -103,14 +114,15 @@ only what it declares. Always run `bun install` from the root.
 - **`customizations.vscode.extensions`** install inside the container. Host
   extensions do not carry over.
 - **`customizations.vscode.settings`** are editor settings applied only inside
-  the container. They make the oxc extension both the linter and the
-  formatter: lint diagnostics as you type, oxfmt on every save, lint fixes on
-  an explicit save. The extension finds the nearest `.oxlintrc.json` for each
-  file, so each app keeps its own lint config. Formatting is repo-wide, so
-  there is one `.oxfmtrc.json` at the root; it was generated from the old
-  Prettier config with `oxfmt --migrate=prettier`. The extension locates the
-  `oxfmt` binary in `node_modules`, which is why it is a root dev dependency
-  and pinned to an exact version while it is still pre-1.0.
+  the container. They make the Biome extension the formatter and linter:
+  format on every save, and on an explicit save also apply safe lint fixes,
+  organise imports and sort JSX props. Biome reads the single `biome.json`
+  at the repo root and finds its binary in `node_modules`, which is why
+  `@biomejs/biome` is a root dev dependency pinned to an exact version, as
+  Biome's own docs recommend. The config excludes `public/`, `*.svg` and
+  `*.html`, so `index.html` and the icon assets are never rewritten. The `apps/api` override turns off `useImportType` because NestJS
+  dependency injection needs runtime class imports under
+  `emitDecoratorMetadata`.
 - **`remoteUser`** avoids working as root. The base image ships a `node` user.
 
 ### `.devcontainer/compose.yaml`
@@ -170,22 +182,25 @@ docker compose config
   "workspaces": ["apps/*"],
   "scripts": {
     "dev": "bun run --filter '*' dev",
-    "lint": "bun run --filter '*' lint",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "lint": "biome lint",
+    "format": "biome format --write",
+    "format:check": "biome format"
   },
   "devDependencies": {
-    "oxfmt": "0.72.0"
+    "@biomejs/biome": "2.5.15"
   }
 }
 ```
 
-`--filter '*'` runs the named script of every workspace package in parallel,
-prefixing output with the package name. Both apps must therefore have scripts
-named `dev` and `lint`. Both `lint` scripts call oxlint. `format` is not
-filtered: oxfmt walks the whole repo from the root, honouring `.gitignore`,
-and formats TypeScript, CSS, JSON, YAML and Markdown alike. The Nest app's `dev`
-was added by hand as an alias:
+`--filter '*'` runs the `dev` script of every workspace package in parallel,
+prefixing output with the package name. Both apps must therefore have a script
+named `dev`. The Biome scripts are not filtered: Biome walks the whole repo
+from the root, honouring `.gitignore` through its `vcs` setting, and the
+per-app `lint` scripts just call `biome lint .` for convenience. `check` is
+the one to run in CI, since it covers lint, format and import order in a
+single pass. The Nest app's `dev` was added by hand as an alias:
 
 ```json
 "dev": "nest start --watch"
@@ -283,4 +298,4 @@ and `portsAttributes`.
 | NestJS           | 12.0    |
 | Postgres         | 17      |
 | Docker Compose   | v5.5    |
-| oxfmt            | 0.72    |
+| Biome            | 2.5.15  |

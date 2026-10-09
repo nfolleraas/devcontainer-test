@@ -75,14 +75,13 @@ A running container does not pick up config changes. Any edit under
   from the Ports panel.
 - Database data lives in a named volume (`pgdata`), so it survives container
   rebuilds. Delete the volume if you want a clean database.
-- Extensions listed in `devcontainer.json` (currently only oxc) install inside the
-  container. Host extensions do not carry over.
-- [oxlint](https://oxc.rs/docs/guide/usage/linter) is the linter and
-  [oxfmt](https://oxc.rs/docs/guide/usage/formatter) the formatter, both from
-  the oxc project and both served by the single oxc extension. The editor
-  lints as you type, formats on save and applies lint fixes on explicit save.
-  Each app has its own `.oxlintrc.json`; formatting rules live in the root
-  `.oxfmtrc.json`. There is no ESLint or Prettier anywhere in the repo.
+- Extensions listed in `devcontainer.json` install inside the container. Host
+  extensions do not carry over.
+- [Biome](https://biomejs.dev/) is the linter, formatter and import sorter,
+  served by the single Biome extension. The editor formats on save and, on an
+  explicit save, applies safe lint fixes, organises imports and sorts JSX
+  props alphabetically. One `biome.json` at the root configures all of it.
+  There is no ESLint, Prettier or oxc anywhere in the repo.
 
 ## Running the project
 
@@ -91,10 +90,15 @@ All commands are run from the repo root, inside the container.
 ```
 bun install        # once, or after dependency changes
 bun run dev        # starts web and api in parallel
-bun run lint       # runs oxlint in every workspace
-bun run format     # formats the whole repo with oxfmt
-bun run format:check  # same, but only reports; use in CI
+bun run check      # lint + format + import order, report only; use in CI
+bun run check:fix  # same, but writes every safe fix
+bun run lint       # lint only
+bun run format     # format only, writes
+bun run format:check  # format only, report
 ```
+
+Biome covers TypeScript, JSX, CSS and JSON. Markdown, YAML, HTML and SVG
+files are left untouched.
 
 `bun run dev` runs the `dev` script of every workspace package and prefixes
 the output with the package name. Then open the **web** port from the Ports
@@ -123,7 +127,7 @@ bun run lint                  # from inside apps/web
 | ------------ | -------------------------- | ----------------------- |
 | `dev`        | Vite dev server with HMR   | `nest start --watch`    |
 | `build`      | `tsc -b && vite build`     | `nest build` to `dist/` |
-| `lint`       | oxlint                     | oxlint, type-aware      |
+| `lint`       | `biome lint .`             | `biome lint .`          |
 | `test`       | –                          | vitest unit tests       |
 | `test:e2e`   | –                          | vitest e2e tests        |
 | `preview`    | serve the production build | –                       |
@@ -162,8 +166,8 @@ symlinks to what that app declares. Always run `bun install` from the root.
 
 - [DEVCONTAINER.md](DEVCONTAINER.md): every file in `.devcontainer/` explained,
   how to add tools, services or extensions, and gotchas met while building it.
-- [apps/web/README.md](apps/web/README.md): the Vite React template notes,
-  including how to enable type-aware oxlint rules and the React Compiler.
+- [apps/web/README.md](apps/web/README.md): the Vite React template notes.
+  Its oxlint section no longer applies; this repo uses Biome.
 - [apps/api/README.md](apps/api/README.md): the NestJS starter notes.
 - [Dev Containers specification](https://containers.dev/) and
   [feature catalog](https://containers.dev/features) for adding tools to the
@@ -182,5 +186,4 @@ symlinks to what that app declares. Always run `bun install` from the root.
 | React            | 19.2    |
 | NestJS           | 12.0    |
 | Postgres         | 17      |
-| oxlint           | 1.x     |
-| oxfmt            | 0.72    |
+| Biome            | 2.5     |
