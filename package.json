@@ -1,5 +1,8 @@
 {
   "name": "devcontainer-test",
   "private": true,
-  "workspaces": ["apps/*"]
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev" 
+  }
 }
