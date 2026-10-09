@@ -4,7 +4,10 @@
   "service": "app",
   "workspaceFolder": "/workspaces/devcontainer-test",
   "features": {
-    "ghcr.io/shyim/devcontainers-features/bun:0": {}
+    "ghcr.io/shyim/devcontainers-features/bun:0": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true
+    }
   },
 
   "forwardPorts": [5173, 3000, 5432],
@@ -14,7 +17,7 @@
     "5432": { "label": "db (postgres)" }
   },
 
-  "postCreateCommand": "bun install",
+  "postCreateCommand": "bash .devcontainer/setup-zsh.sh && bun install",
 
   "customizations": {
     "vscode": {
@@ -31,6 +34,7 @@
         "YoavBls.pretty-ts-errors"
       ],
       "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
         "workbench.startupEditor": "none",
         "workbench.iconTheme": "material-icon-theme",
         "editor.defaultFormatter": "biomejs.biome",
