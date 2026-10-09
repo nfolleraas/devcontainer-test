@@ -1,0 +1,29 @@
+{
+  "name": "devcontainer-test",
+  "dockerComposeFile": "compose.yaml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/devcontainer-test",
+  "features": {
+    "ghcr.io/shyim/devcontainers-features/bun:0": {}
+  },
+
+  "forwardPorts": [5173, 3000, 5432],
+  "portsAttributes": {
+    "5173": { "label": "web (vite)" },
+    "3000": { "label": "api (nest)" },
+    "5432": { "label": "db (postgres)" }
+  },
+
+  "postCreateCommand": "bun install",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oxc.oxc-vscode",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+
+  "remoteUser": "node"
+}
