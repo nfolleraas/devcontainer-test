@@ -49,7 +49,7 @@ function App() {
             <li>
               <a href="https://react.dev/" rel="noopener" target="_blank">
                 <img alt="" className="button-icon" src={reactLogo} />
-                Learn more
+                Learn React
               </a>
             </li>
           </ul>
