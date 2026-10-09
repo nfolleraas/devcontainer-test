@@ -21,7 +21,14 @@
       "extensions": [
         "oxc.oxc-vscode",
         "esbenp.prettier-vscode"
-      ]
+      ],
+      "settings": {
+        "oxc.enable": true,
+        "oxc.lint.run": "onType",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.oxc": "explicit"
+        }
+      }
     }
   },
 

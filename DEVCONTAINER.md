@@ -72,7 +72,14 @@ only what it declares. Always run `bun install` from the root.
       "extensions": [
         "oxc.oxc-vscode",
         "esbenp.prettier-vscode"
-      ]
+      ],
+      "settings": {
+        "oxc.enable": true,
+        "oxc.lint.run": "onType",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.oxc": "explicit"
+        }
+      }
     }
   },
 
@@ -96,6 +103,12 @@ only what it declares. Always run `bun install` from the root.
   by hand.
 - **`customizations.vscode.extensions`** install inside the container. Host
   extensions do not carry over.
+- **`customizations.vscode.settings`** are editor settings applied only inside
+  the container. They make oxc the default linter: diagnostics as you type,
+  auto-fix on an explicit save. The extension finds the nearest
+  `.oxlintrc.json` for each file, so each app keeps its own config and no
+  root config is needed. If a root one is ever added, the apps should
+  `extends` it rather than duplicate rules.
 - **`remoteUser`** avoids working as root. The base image ships a `node` user.
 
 ### `.devcontainer/compose.yaml`
@@ -154,14 +167,16 @@ docker compose config
   "private": true,
   "workspaces": ["apps/*"],
   "scripts": {
-    "dev": "bun run --filter '*' dev"
+    "dev": "bun run --filter '*' dev",
+    "lint": "bun run --filter '*' lint"
   }
 }
 ```
 
-`--filter '*'` runs the `dev` script of every workspace package in parallel,
-prefixing output with the package name. Both apps must therefore have a script
-named `dev`. The Nest app's was added by hand as an alias:
+`--filter '*'` runs the named script of every workspace package in parallel,
+prefixing output with the package name. Both apps must therefore have scripts
+named `dev` and `lint`. Both `lint` scripts call oxlint. The Nest app's `dev`
+was added by hand as an alias:
 
 ```json
 "dev": "nest start --watch"

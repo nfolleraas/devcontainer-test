@@ -77,6 +77,9 @@ A running container does not pick up config changes. Any edit under
   rebuilds. Delete the volume if you want a clean database.
 - Extensions listed in `devcontainer.json` (oxc, Prettier) install inside the
   container. Host extensions do not carry over.
+- [oxlint](https://oxc.rs/docs/guide/usage/linter) is the project's linter.
+  The oxc extension lints as you type and fixes on explicit save, and every
+  app has its own `.oxlintrc.json`. There is no ESLint anywhere in the repo.
 
 ## Running the project
 
@@ -85,6 +88,7 @@ All commands are run from the repo root, inside the container.
 ```
 bun install        # once, or after dependency changes
 bun run dev        # starts web and api in parallel
+bun run lint       # runs oxlint in every workspace
 ```
 
 `bun run dev` runs the `dev` script of every workspace package and prefixes
