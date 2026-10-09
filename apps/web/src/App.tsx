@@ -13,12 +13,7 @@ function App() {
         <div className="hero">
           <img alt="" className="base" height="179" src={heroImg} width="170" />
           <img alt="React logo" className="framework" src={reactLogo} />
-          <img
-            alt="Vite logo"
-            className="vite"
-            onAbort={() => {}}
-            src={viteLogo}
-          />
+          <img alt="Vite logo" className="vite" src={viteLogo} />
         </div>
         <div>
           <h1>Get started</h1>
