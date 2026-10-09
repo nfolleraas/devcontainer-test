@@ -102,8 +102,13 @@ bun run --filter api dev
 
 ### Per-app scripts
 
-Run these with `bun run --filter <app> <script>` from the root, or `bun run
-<script>` from inside the app's directory.
+Run them from the root with a workspace filter, or with plain `bun run` from
+inside the app's directory:
+
+```
+bun run --filter web lint     # from the root
+bun run lint                  # from inside apps/web
+```
 
 | Script | `web` | `api` |
 |---|---|---|
