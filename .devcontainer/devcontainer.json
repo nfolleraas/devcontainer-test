@@ -31,6 +31,8 @@
         "YoavBls.pretty-ts-errors"
       ],
       "settings": {
+        "workbench.startupEditor": "none",
+        "workbench.iconTheme": "material-icon-theme",
         "editor.defaultFormatter": "biomejs.biome",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {

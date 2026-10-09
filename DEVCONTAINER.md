@@ -82,6 +82,8 @@ only what it declares. Always run `bun install` from the root.
         "YoavBls.pretty-ts-errors"
       ],
       "settings": {
+        "workbench.startupEditor": "none",
+        "workbench.iconTheme": "material-icon-theme",
         "editor.defaultFormatter": "biomejs.biome",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
@@ -114,7 +116,9 @@ only what it declares. Always run `bun install` from the root.
 - **`customizations.vscode.extensions`** install inside the container. Host
   extensions do not carry over.
 - **`customizations.vscode.settings`** are editor settings applied only inside
-  the container. They make the Biome extension the formatter and linter:
+  the container. `workbench.iconTheme` selects Material Icon Theme for
+  everyone, since installing the extension alone does not activate it. The
+  rest make the Biome extension the formatter and linter:
   format on every save, and on an explicit save also apply safe lint fixes,
   organise imports and sort JSX props. Biome reads the single `biome.json`
   at the repo root and finds its binary in `node_modules`, which is why
