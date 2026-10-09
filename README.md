@@ -3,11 +3,11 @@
 A small bun-workspaces monorepo used to try out a VS Code dev container that
 runs a React frontend, a NestJS backend and a Postgres database together.
 
-| App | Stack | Path | Port (in container) |
-|---|---|---|---|
-| `web` | React 19 + TypeScript, Vite 8 | `apps/web` | 5173 |
-| `api` | NestJS 12 + TypeScript | `apps/api` | 3000, all routes under `/api` |
-| `db` | Postgres 17 | compose service | 5432, reachable as hostname `db` |
+| App   | Stack                         | Path            | Port (in container)              |
+| ----- | ----------------------------- | --------------- | -------------------------------- |
+| `web` | React 19 + TypeScript, Vite 8 | `apps/web`      | 5173                             |
+| `api` | NestJS 12 + TypeScript        | `apps/api`      | 3000, all routes under `/api`    |
+| `db`  | Postgres 17                   | compose service | 5432, reachable as hostname `db` |
 
 For a line-by-line explanation of the container setup, why each setting
 exists and how to change it, see [DEVCONTAINER.md](DEVCONTAINER.md).
@@ -31,11 +31,11 @@ the same database without installing anything on their machine.
 
 Everything the container needs is described in `.devcontainer/`:
 
-| File | Purpose |
-|---|---|
-| `devcontainer.json` | What VS Code attaches to, which ports to forward, which extensions to install, what to run after creation |
-| `compose.yaml` | The two containers: `app` (Node 22 + bun, holds the repo) and `db` (Postgres 17) |
-| `devcontainer-lock.json` | Pinned versions of the installed features. Commit it, like `bun.lock` |
+| File                     | Purpose                                                                                                   |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `devcontainer.json`      | What VS Code attaches to, which ports to forward, which extensions to install, what to run after creation |
+| `compose.yaml`           | The two containers: `app` (Node 22 + bun, holds the repo) and `db` (Postgres 17)                          |
+| `devcontainer-lock.json` | Pinned versions of the installed features. Commit it, like `bun.lock`                                     |
 
 ### Open the project in the container
 
@@ -51,12 +51,12 @@ usual from either side.
 
 ### Everyday commands
 
-| Action | Command palette entry |
-|---|---|
-| Rebuild after editing `devcontainer.json` or `compose.yaml` | **Dev Containers: Rebuild Container** |
-| Rebuild from scratch, discarding image cache | **Dev Containers: Rebuild Container Without Cache** |
-| Leave the container and work on the host | **Dev Containers: Reopen Folder Locally** |
-| See forwarded ports and their real host port | **Ports** panel in the bottom bar |
+| Action                                                      | Command palette entry                               |
+| ----------------------------------------------------------- | --------------------------------------------------- |
+| Rebuild after editing `devcontainer.json` or `compose.yaml` | **Dev Containers: Rebuild Container**               |
+| Rebuild from scratch, discarding image cache                | **Dev Containers: Rebuild Container Without Cache** |
+| Leave the container and work on the host                    | **Dev Containers: Reopen Folder Locally**           |
+| See forwarded ports and their real host port                | **Ports** panel in the bottom bar                   |
 
 A running container does not pick up config changes. Any edit under
 `.devcontainer/` needs a rebuild.
@@ -75,11 +75,14 @@ A running container does not pick up config changes. Any edit under
   from the Ports panel.
 - Database data lives in a named volume (`pgdata`), so it survives container
   rebuilds. Delete the volume if you want a clean database.
-- Extensions listed in `devcontainer.json` (oxc, Prettier) install inside the
+- Extensions listed in `devcontainer.json` (currently only oxc) install inside the
   container. Host extensions do not carry over.
-- [oxlint](https://oxc.rs/docs/guide/usage/linter) is the project's linter.
-  The oxc extension lints as you type and fixes on explicit save, and every
-  app has its own `.oxlintrc.json`. There is no ESLint anywhere in the repo.
+- [oxlint](https://oxc.rs/docs/guide/usage/linter) is the linter and
+  [oxfmt](https://oxc.rs/docs/guide/usage/formatter) the formatter, both from
+  the oxc project and both served by the single oxc extension. The editor
+  lints as you type, formats on save and applies lint fixes on explicit save.
+  Each app has its own `.oxlintrc.json`; formatting rules live in the root
+  `.oxfmtrc.json`. There is no ESLint or Prettier anywhere in the repo.
 
 ## Running the project
 
@@ -89,6 +92,8 @@ All commands are run from the repo root, inside the container.
 bun install        # once, or after dependency changes
 bun run dev        # starts web and api in parallel
 bun run lint       # runs oxlint in every workspace
+bun run format     # formats the whole repo with oxfmt
+bun run format:check  # same, but only reports; use in CI
 ```
 
 `bun run dev` runs the `dev` script of every workspace package and prefixes
@@ -114,16 +119,15 @@ bun run --filter web lint     # from the root
 bun run lint                  # from inside apps/web
 ```
 
-| Script | `web` | `api` |
-|---|---|---|
-| `dev` | Vite dev server with HMR | `nest start --watch` |
-| `build` | `tsc -b && vite build` | `nest build` to `dist/` |
-| `lint` | oxlint | oxlint, type-aware |
-| `test` | – | vitest unit tests |
-| `test:e2e` | – | vitest e2e tests |
-| `format` | – | Prettier over `src/` and `test/` |
-| `preview` | serve the production build | – |
-| `start:prod` | – | `node dist/main` |
+| Script       | `web`                      | `api`                   |
+| ------------ | -------------------------- | ----------------------- |
+| `dev`        | Vite dev server with HMR   | `nest start --watch`    |
+| `build`      | `tsc -b && vite build`     | `nest build` to `dist/` |
+| `lint`       | oxlint                     | oxlint, type-aware      |
+| `test`       | –                          | vitest unit tests       |
+| `test:e2e`   | –                          | vitest e2e tests        |
+| `preview`    | serve the production build | –                       |
+| `start:prod` | –                          | `node dist/main`        |
 
 ### Database
 
@@ -170,11 +174,13 @@ symlinks to what that app declares. Always run `bun install` from the root.
 
 ## Versions
 
-| Tool | Version |
-|---|---|
-| Node (container) | 22 |
-| bun | 1.4 |
-| Vite | 8.3 |
-| React | 19.2 |
-| NestJS | 12.0 |
-| Postgres | 17 |
+| Tool             | Version |
+| ---------------- | ------- |
+| Node (container) | 22      |
+| bun              | 1.4     |
+| Vite             | 8.3     |
+| React            | 19.2    |
+| NestJS           | 12.0    |
+| Postgres         | 17      |
+| oxlint           | 1.x     |
+| oxfmt            | 0.72    |

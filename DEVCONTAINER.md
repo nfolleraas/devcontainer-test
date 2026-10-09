@@ -9,11 +9,11 @@ piece exists, and how to change it. Written after building it step by step on
 One VS Code dev container running two apps from the same repo at the same time,
 plus a Postgres database in a sidecar container.
 
-| Piece | Where | Runs on |
-|---|---|---|
-| React + TypeScript (Vite 8) | `apps/web` | container port 5173 |
-| NestJS 12 + TypeScript | `apps/api` | container port 3000, routes under `/api` |
-| Postgres 17 | `db` compose service | hostname `db`, port 5432, compose network only |
+| Piece                       | Where                | Runs on                                        |
+| --------------------------- | -------------------- | ---------------------------------------------- |
+| React + TypeScript (Vite 8) | `apps/web`           | container port 5173                            |
+| NestJS 12 + TypeScript      | `apps/api`           | container port 3000, routes under `/api`       |
+| Postgres 17                 | `db` compose service | hostname `db`, port 5432, compose network only |
 
 Start everything from the repo root inside the container:
 
@@ -69,13 +69,12 @@ only what it declares. Always run `bun install` from the root.
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oxc.oxc-vscode",
-        "esbenp.prettier-vscode"
-      ],
+      "extensions": ["oxc.oxc-vscode"],
       "settings": {
         "oxc.enable": true,
         "oxc.lint.run": "onType",
+        "editor.defaultFormatter": "oxc.oxc-vscode",
+        "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
           "source.fixAll.oxc": "explicit"
         }
@@ -104,11 +103,14 @@ only what it declares. Always run `bun install` from the root.
 - **`customizations.vscode.extensions`** install inside the container. Host
   extensions do not carry over.
 - **`customizations.vscode.settings`** are editor settings applied only inside
-  the container. They make oxc the default linter: diagnostics as you type,
-  auto-fix on an explicit save. The extension finds the nearest
-  `.oxlintrc.json` for each file, so each app keeps its own config and no
-  root config is needed. If a root one is ever added, the apps should
-  `extends` it rather than duplicate rules.
+  the container. They make the oxc extension both the linter and the
+  formatter: lint diagnostics as you type, oxfmt on every save, lint fixes on
+  an explicit save. The extension finds the nearest `.oxlintrc.json` for each
+  file, so each app keeps its own lint config. Formatting is repo-wide, so
+  there is one `.oxfmtrc.json` at the root; it was generated from the old
+  Prettier config with `oxfmt --migrate=prettier`. The extension locates the
+  `oxfmt` binary in `node_modules`, which is why it is a root dev dependency
+  and pinned to an exact version while it is still pre-1.0.
 - **`remoteUser`** avoids working as root. The base image ships a `node` user.
 
 ### `.devcontainer/compose.yaml`
@@ -150,7 +152,7 @@ volumes:
 - **`db`** has no `ports` block on purpose. The app reaches it over the compose
   network. Host access, if ever wanted, goes through VS Code port forwarding.
 - **`pgdata`** is a named volume, so data survives container rebuilds. Note the
-  two different `volumes:` shapes: a *list* inside a service, a *mapping* at
+  two different `volumes:` shapes: a _list_ inside a service, a _mapping_ at
   the top level. Getting this wrong gives `volumes must be a mapping`.
 
 Validate after editing, from inside `.devcontainer/`:
@@ -168,14 +170,21 @@ docker compose config
   "workspaces": ["apps/*"],
   "scripts": {
     "dev": "bun run --filter '*' dev",
-    "lint": "bun run --filter '*' lint"
+    "lint": "bun run --filter '*' lint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "oxfmt": "0.72.0"
   }
 }
 ```
 
 `--filter '*'` runs the named script of every workspace package in parallel,
 prefixing output with the package name. Both apps must therefore have scripts
-named `dev` and `lint`. Both `lint` scripts call oxlint. The Nest app's `dev`
+named `dev` and `lint`. Both `lint` scripts call oxlint. `format` is not
+filtered: oxfmt walks the whole repo from the root, honouring `.gitignore`,
+and formats TypeScript, CSS, JSON, YAML and Markdown alike. The Nest app's `dev`
 was added by hand as an alias:
 
 ```json
@@ -216,7 +225,7 @@ directory and below, so per-app ones were removed. Includes `node_modules`,
 ## How to change things
 
 **Any edit to `devcontainer.json` or `compose.yaml`** requires
-*Dev Containers: Rebuild Container* from the command palette. A running
+_Dev Containers: Rebuild Container_ from the command palette. A running
 container does not pick up config changes.
 
 **Add a tool to the container** (e.g. a CLI): look for a feature at
@@ -243,7 +252,7 @@ only looks at the `app` container and will show as unused.
 
 **Add a VS Code extension**: add its ID to `customizations.vscode.extensions`
 and rebuild, or install it from the Extensions view while in the container
-and choose *Add to devcontainer.json*.
+and choose _Add to devcontainer.json_.
 
 **Change a port**: update it in three places: the app's own config, `forwardPorts`,
 and `portsAttributes`.
@@ -265,12 +274,13 @@ and `portsAttributes`.
 
 ## Versions at time of writing
 
-| Tool | Version |
-|---|---|
-| Node (container) | 22 |
-| bun | 1.4.2 |
-| Vite | 8.3 |
-| React | 19.2 |
-| NestJS | 12.0 |
-| Postgres | 17 |
-| Docker Compose | v5.5 |
+| Tool             | Version |
+| ---------------- | ------- |
+| Node (container) | 22      |
+| bun              | 1.4.2   |
+| Vite             | 8.3     |
+| React            | 19.2    |
+| NestJS           | 12.0    |
+| Postgres         | 17      |
+| Docker Compose   | v5.5    |
+| oxfmt            | 0.72    |
