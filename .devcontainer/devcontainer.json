@@ -10,11 +10,12 @@
     }
   },
 
-  "forwardPorts": [5173, 3000, 5432],
+  "forwardPorts": [5173, 3000, 5432, 8081],
   "portsAttributes": {
     "5173": { "label": "web (vite)" },
     "3000": { "label": "api (nest)" },
-    "5432": { "label": "db (postgres)" }
+    "5432": { "label": "db (postgres)" },
+    "8081": { "label": "webui (postgres)" }
   },
 
   "postCreateCommand": "bash .devcontainer/setup-zsh.sh && bun install",
@@ -31,7 +32,9 @@
         "aaron-bond.better-comments",
         "usernamehw.errorlens",
         "PKief.material-icon-theme",
-        "YoavBls.pretty-ts-errors"
+        "YoavBls.pretty-ts-errors",
+        "ms-azuretools.vscode-containers",
+        "openai.chatgpt"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh",

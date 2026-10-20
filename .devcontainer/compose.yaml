@@ -1,5 +1,6 @@
 services:
   app:
+    container_name: app
     image: mcr.microsoft.com/devcontainers/typescript-node:22-bookworm
     volumes:
       - ..:/workspaces/devcontainer-test:cached
@@ -9,6 +10,7 @@ services:
     depends_on:
       - db
   db:
+    container_name: db
     image: postgres:17
     environment:
       - POSTGRES_USER=app
@@ -16,6 +18,16 @@ services:
       - POSTGRES_DB=app
     volumes:
       - pgdata:/var/lib/postgresql/data
+  pgweb:
+    container_name: pgweb
+    image: sosedoff/pgweb
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    environment:
+      - PGWEB_DATABASE_URL=postgres://app:app@db:5432/app?sslmode=disable
+    depends_on:
+      - db
 
 volumes:
   pgdata:
